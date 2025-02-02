@@ -27,7 +27,17 @@ function App() {
   const handleSend = () => {
     const updatedMessages = { ...messages };
     selectedModels.forEach((model) => {
-      updatedMessages[model] = [...updatedMessages[model], currentInput];
+      const userMessage = `${currentInput}`;
+      let replyMessage = "";
+      if (model === "GPT-4o mini") {
+        // TODO: GPT-4o mini API call here
+        replyMessage = `GPT-4o mini - text is: ${currentInput}`;
+      } else {
+        // TODO: deepseek API call here
+        replyMessage = `deepseek - text is: ${currentInput}`;
+      }
+      // const replyMessage = `${model} - text is: ${currentInput}`;
+      updatedMessages[model] = [...updatedMessages[model], userMessage, replyMessage];
     });
     setMessages(updatedMessages);
     setCurrentInput("");

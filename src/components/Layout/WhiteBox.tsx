@@ -20,7 +20,7 @@ const WhiteBox = ({
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
-  }, [handleSend]);
+  }, [message]);
 
   return (
     <div className="bg-white p-4 rounded-lg shadow-md flex flex-col">
