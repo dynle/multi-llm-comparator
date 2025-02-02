@@ -1,6 +1,6 @@
 const LeftPanel = ({ setSelectedModel }: { setSelectedModel: (model: string) => void }) => (
   <aside className="w-1/6 bg-gray-50 p-4">
-    <h2 className="text-xl font-bold">Models</h2>
+    <h2 className="text-xl font-bold">AI Models</h2>
     <ul className="mt-4 space-y-2">
       <li>
         <a
