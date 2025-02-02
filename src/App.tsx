@@ -1,11 +1,11 @@
 import { useState } from "react";
 import LeftPanel from "@/components/Layout/LeftPanel";
-import MainContent from "@/components/Layout/MainContent";
-import WhiteBox from "@/components/Layout/WhiteBox";
+import MainConversation from "@/components/Layout/MainConversation";
+import PromptInput from "@/components/Layout/PromptInput";
 
 function App() {
   const [selectedModels, setSelectedModels] = useState(["GPT-4o mini"]);
-  const [messages, setMessages] = useState<{ [key: string]: string[] }>({
+  const [prompts, setPrompts] = useState<{ [key: string]: string[] }>({
     "GPT-4o mini": [],
   });
   const [currentInput, setCurrentInput] = useState("");
@@ -13,33 +13,33 @@ function App() {
   const handleAddModel = (model: string) => {
     if (!selectedModels.includes(model)) {
       setSelectedModels([...selectedModels, model]);
-      setMessages({ ...messages, [model]: [] });
+      setPrompts({ ...prompts, [model]: [] });
     }
   };
 
   const handleRemoveModel = (model: string) => {
     setSelectedModels(selectedModels.filter((m) => m !== model));
-    const updatedMessages = { ...messages };
-    delete updatedMessages[model];
-    setMessages(updatedMessages);
+    const updatedPrompts = { ...prompts };
+    delete updatedPrompts[model];
+    setPrompts(updatedPrompts);
   };
 
   const handleSend = () => {
-    const updatedMessages = { ...messages };
+    // TODO: LLM API call here
+    const updatedPrompts = { ...prompts };
     selectedModels.forEach((model) => {
-      const userMessage = `${currentInput}`;
-      let replyMessage = "";
+      const userPrompt = `${currentInput}`;
+      let replyPrompt = "";
       if (model === "GPT-4o mini") {
         // TODO: GPT-4o mini API call here
-        replyMessage = `GPT-4o mini - text is: ${currentInput}`;
+        replyPrompt = `GPT-4o mini - text is: ${currentInput}`;
       } else {
         // TODO: deepseek API call here
-        replyMessage = `deepseek - text is: ${currentInput}`;
+        replyPrompt = `deepseek - text is: ${currentInput}`;
       }
-      // const replyMessage = `${model} - text is: ${currentInput}`;
-      updatedMessages[model] = [...updatedMessages[model], userMessage, replyMessage];
+      updatedPrompts[model] = [...updatedPrompts[model], userPrompt, replyPrompt];
     });
-    setMessages(updatedMessages);
+    setPrompts(updatedPrompts);
     setCurrentInput("");
   };
 
@@ -60,15 +60,15 @@ function App() {
                 >
                   X
                 </button>
-                <MainContent selectedModel={model} messages={messages[model]} />
+                <MainConversation selectedModel={model} prompts={prompts[model]} />
               </div>
             </div>
           ))}
         </div>
         <div className="flex-[1] bg-white p-4 shadow-md">
-          <WhiteBox
-            message={currentInput}
-            setMessage={setCurrentInput}
+          <PromptInput
+            prompt={currentInput}
+            setPrompt={setCurrentInput}
             handleSend={handleSend}
           />
         </div>
