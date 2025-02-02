@@ -5,14 +5,15 @@ import WhiteBox from "@/components/Layout/WhiteBox";
 
 function App() {
   const [selectedModels, setSelectedModels] = useState(["GPT-4o mini"]);
-  const [messages, setMessages] = useState<{ [key: string]: string }>({
-    "GPT-4o mini": "",
+  const [messages, setMessages] = useState<{ [key: string]: string[] }>({
+    "GPT-4o mini": [],
   });
+  const [currentInput, setCurrentInput] = useState("");
 
   const handleAddModel = (model: string) => {
     if (!selectedModels.includes(model)) {
       setSelectedModels([...selectedModels, model]);
-      setMessages({ ...messages, [model]: "" });
+      setMessages({ ...messages, [model]: [] });
     }
   };
 
@@ -24,18 +25,12 @@ function App() {
   };
 
   const handleSend = () => {
-    const message = selectedModels
-      .map((model) => `${model}: ${messages[model] || ""}`)
-      .join("\n");
-    alert(message);
-  };
-
-  const handleMessageChange = (value: string) => {
     const updatedMessages = { ...messages };
     selectedModels.forEach((model) => {
-      updatedMessages[model] = value;
+      updatedMessages[model] = [...updatedMessages[model], currentInput];
     });
     setMessages(updatedMessages);
+    setCurrentInput("");
   };
 
   return (
@@ -55,15 +50,15 @@ function App() {
                 >
                   X
                 </button>
-                <MainContent selectedModel={model} />
+                <MainContent selectedModel={model} messages={messages[model]} />
               </div>
             </div>
           ))}
         </div>
         <div className="flex-[1] bg-white p-4 shadow-md">
           <WhiteBox
-            message={messages[selectedModels[0]] || ""}
-            setMessage={handleMessageChange}
+            message={currentInput}
+            setMessage={setCurrentInput}
             handleSend={handleSend}
           />
         </div>
