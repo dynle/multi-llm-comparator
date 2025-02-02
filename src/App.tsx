@@ -48,12 +48,12 @@ function App() {
       ]
     })
 
-    console.log(completion.choices[0].message)
-    return completion.choices[0].message
+    // TODO: 될때도 있고 안될때도 있음
+    console.log(completion.choices[0].message.content)
+    return completion.choices[0].message.content
   }
 
   const handleSend = () => {
-    // TODO: LLM API call here
     const updatedPrompts = { ...prompts };
     selectedModels.forEach((model) => {
       const userPrompt: string = `${currentInput}`;
@@ -66,6 +66,7 @@ function App() {
         // response = `deepseek - text is: ${currentInput}`;
         response = getDeepseekResponse(currentInput)
       }
+      // TODO: type check
       updatedPrompts[model] = [...updatedPrompts[model], userPrompt, response];
     });
     setPrompts(updatedPrompts);
