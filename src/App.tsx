@@ -2,6 +2,10 @@ import { useState } from "react";
 import LeftPanel from "@/components/Layout/LeftPanel";
 import MainConversation from "@/components/Layout/MainConversation";
 import PromptInput from "@/components/Layout/PromptInput";
+import OpenAI from "openai"
+import { ChatCompletionMessage } from "openai/resources/index.mjs";
+
+const openrouterDeekseekApiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
 
 function App() {
   const [selectedModels, setSelectedModels] = useState(["GPT-4o mini"]);
@@ -23,21 +27,46 @@ function App() {
     delete updatedPrompts[model];
     setPrompts(updatedPrompts);
   };
+  const openai = new OpenAI({
+    baseURL: "https://openrouter.ai/api/v1",
+    apiKey : openrouterDeekseekApiKey,
+    dangerouslyAllowBrowser: true,
+    // defaultHeaders: {
+    //   "HTTP-Referer": "<YOUR_SITE_URL>", // Optional. Site URL for rankings on openrouter.ai.
+    //   "X-Title": "<YOUR_SITE_NAME>", // Optional. Site title for rankings on openrouter.ai.
+    // }
+  })
+
+  const getDeepseekResponse = async (currentInput: string) => {
+    const completion = await openai.chat.completions.create({
+      model: "deepseek/deepseek-r1:free",
+      messages: [
+        {
+          "role": "user",
+          "content": currentInput
+        }
+      ]
+    })
+
+    console.log(completion.choices[0].message)
+    return completion.choices[0].message
+  }
 
   const handleSend = () => {
     // TODO: LLM API call here
     const updatedPrompts = { ...prompts };
     selectedModels.forEach((model) => {
-      const userPrompt = `${currentInput}`;
-      let replyPrompt = "";
+      const userPrompt: string = `${currentInput}`;
+      let response: string | Promise<ChatCompletionMessage>;
       if (model === "GPT-4o mini") {
         // TODO: GPT-4o mini API call here
-        replyPrompt = `GPT-4o mini - text is: ${currentInput}`;
+        response = `GPT-4o mini - text is: ${currentInput}`;
       } else {
         // TODO: deepseek API call here
-        replyPrompt = `deepseek - text is: ${currentInput}`;
+        // response = `deepseek - text is: ${currentInput}`;
+        response = getDeepseekResponse(currentInput)
       }
-      updatedPrompts[model] = [...updatedPrompts[model], userPrompt, replyPrompt];
+      updatedPrompts[model] = [...updatedPrompts[model], userPrompt, response];
     });
     setPrompts(updatedPrompts);
     setCurrentInput("");
