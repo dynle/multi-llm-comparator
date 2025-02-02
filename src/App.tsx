@@ -4,20 +4,70 @@ import MainContent from "@/components/Layout/MainContent";
 import WhiteBox from "@/components/Layout/WhiteBox";
 
 function App() {
-  const [selectedModel, setSelectedModel] = useState("GPT-4o mini");
-  const [message, setMessage] = useState("");
+  const [selectedModels, setSelectedModels] = useState(["GPT-4o mini"]);
+  const [messages, setMessages] = useState<{ [key: string]: string }>({
+    "GPT-4o mini": "",
+  });
+
+  const handleAddModel = (model: string) => {
+    if (!selectedModels.includes(model)) {
+      setSelectedModels([...selectedModels, model]);
+      setMessages({ ...messages, [model]: "" });
+    }
+  };
+
+  const handleRemoveModel = (model: string) => {
+    setSelectedModels(selectedModels.filter((m) => m !== model));
+    const updatedMessages = { ...messages };
+    delete updatedMessages[model];
+    setMessages(updatedMessages);
+  };
 
   const handleSend = () => {
-    alert(`Entered text: ${message}`);
+    const message = selectedModels
+      .map((model) => `${model}: ${messages[model] || ""}`)
+      .join("\n");
+    alert(message);
+  };
+
+  const handleMessageChange = (value: string) => {
+    const updatedMessages = { ...messages };
+    selectedModels.forEach((model) => {
+      updatedMessages[model] = value;
+    });
+    setMessages(updatedMessages);
   };
 
   return (
     <div className="flex min-h-screen">
-      <LeftPanel setSelectedModel={setSelectedModel} />
-      <main className="flex-1 bg-gray-200 p-8 flex flex-col">
-        <MainContent selectedModel={selectedModel} />
-        <WhiteBox message={message} setMessage={setMessage} handleSend={handleSend} />
-      </main>
+      <LeftPanel setSelectedModel={handleAddModel} />
+      <div className="flex flex-col flex-1">
+        <div className="flex-[7] flex bg-gray-200 p-4 gap-4">
+          {selectedModels.map((model) => (
+            <div key={model} className="flex-1 min-w-[300px] flex flex-col">
+              <div className="flex-1 bg-gray-50 p-4 rounded-lg shadow-lg relative flex flex-col">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveModel(model);
+                  }}
+                  className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+                >
+                  X
+                </button>
+                <MainContent selectedModel={model} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="flex-[1] bg-white p-4 shadow-md">
+          <WhiteBox
+            message={messages[selectedModels[0]] || ""}
+            setMessage={handleMessageChange}
+            handleSend={handleSend}
+          />
+        </div>
+      </div>
     </div>
   );
 }
